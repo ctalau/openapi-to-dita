@@ -1,0 +1,1028 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "The REST API of Oxygen Content Fusion",
+        "version": "1.2-SNAPSHOT",
+        "title": "Oxygen Content Fusion API"
+    },
+    "host": "fusion.oxygenxml.com",
+    "basePath": "//",
+    "tags": [
+        {"name": "internal"},
+        {"name": "locking"},
+        {"name": "task"},
+        {"name": "user"}
+    ],
+    "schemes": ["https"],
+    "paths": {
+        "/api/author/files": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Get the content of a file.",
+                "description": "",
+                "operationId": "getContent",
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            },
+            "put": {
+                "tags": ["task"],
+                "summary": "Get the content of a file.",
+                "description": "",
+                "operationId": "setContent",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/author/files/makeReviewable": {
+            "post": {
+                "tags": ["task"],
+                "operationId": "makeFileReviewable",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {"$ref": "#/definitions/FileLocationParams"}
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/FileDataWithLockInfo"}
+                        },
+                        "headers": {}
+                    }
+                }
+            }
+        },
+        "/api/author/folders": {
+            "get": {
+                "tags": ["task"],
+                "summary": "List the files from a given folder.",
+                "description": "",
+                "operationId": "getContent",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "url",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/author/lock/{file-id}": {
+            "get": {
+                "tags": ["locking"],
+                "summary": "Gets the lock status on a file.",
+                "description": "",
+                "operationId": "getLockStatus",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "file-id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            },
+            "post": {
+                "tags": ["locking"],
+                "summary": "Update the lock on a file.",
+                "description": "",
+                "operationId": "updateLock",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "file-id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            },
+            "delete": {
+                "tags": ["locking"],
+                "summary": "Removes the lock from a file.",
+                "description": "",
+                "operationId": "unlock",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "file-id",
+                        "in": "path",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/logout": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Clears the locks set on files.",
+                "description": "",
+                "operationId": "getContent",
+                "parameters": [],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": ["user"],
+                "summary": "Returns the current user's details",
+                "description": "",
+                "operationId": "me",
+                "produces": ["application/json"],
+                "parameters": [],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/me/agreeToTerms": {
+            "post": {
+                "tags": ["user"],
+                "summary": "Records the users consent with our terms and conditions",
+                "description": "",
+                "operationId": "agreeToTerms",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "required": false,
+                        "schema": {"$ref": "#/definitions/AgreeWithTermsParams"}
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/me/delete": {
+            "post": {
+                "tags": ["user"],
+                "summary": "Deletes the current user",
+                "description": "",
+                "operationId": "deleteMe",
+                "produces": ["application/json"],
+                "parameters": [],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/activities/statistics": {
+            "get": {
+                "tags": ["internal"],
+                "summary": "Returns statistics for activity found on tasks associated with the current user",
+                "description": "",
+                "operationId": "getAllActivitiesStatistics",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "The user's role for the retrieved tasks. Possible values are: \"OWNER\" and \"REVIEWER\". If no role is specified, all tasks that are associated with the user are returned.",
+                        "required": false,
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "collectionFormat": "multi"
+                    },
+                    {
+                        "name": "countChangesFrom",
+                        "in": "query",
+                        "description": "The start time for counting changed files for each task, in milliseconds. If no time is specified, the number of all changed files is returned.",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "name": "task",
+                        "in": "query",
+                        "description": "The ID of a review task to return the statistics. If no task is specified, the statistics for activity on all tasks associated with the current user are returned.",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {"$ref": "#/definitions/TasksActivitiesStatistics"}
+                    }
+                }
+            }
+        },
+        "/api/review/tasks": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Returns tasks associated with the current user",
+                "description": "",
+                "operationId": "getTasks",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "The user's role for the retrieved tasks. Possible values are: \"OWNER\" and \"REVIEWER\"If no role is specified, all tasks that are associated with the user are returned.",
+                        "required": false,
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "collectionFormat": "multi"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/upload": {
+            "post": {
+                "tags": ["task"],
+                "summary": "Uploads a review task",
+                "description": "",
+                "operationId": "upload",
+                "consumes": ["multipart/form-data"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "A multipart message with two sections. \nThe `details` section should be JSON with the following fields: \n - `title`: the task summary as a string\n - `entryPoints`: the files explicitely sent for review as a list of paths relative to the root of the task zip\n - `contextMapRelPah`: (optional) paths relative to the root of the task zip\n - `localBaseURL`: the URL of the task on the computer from which it was uploaded \nThe `task` part should contain a zip archive with all the supporting files of the task.",
+                        "required": false,
+                        "schema": {"$ref": "#/definitions/MultipartFormDataInput"}
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {"$ref": "#/definitions/TaskGeneralData"}
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Returns information about a particular review task",
+                "description": "",
+                "operationId": "getDetails",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {"$ref": "#/definitions/TaskGeneralData"}
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["task"],
+                "summary": " Deletes a particular review task",
+                "description": "",
+                "operationId": "deleteTask",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/activity": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Returns a list of activity items for a particular review task",
+                "description": "",
+                "operationId": "getActivity",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/ActivityData"}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}/assign": {
+            "post": {
+                "tags": ["task"],
+                "summary": "Assigns a task to another user",
+                "description": "",
+                "operationId": "assignTask",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The id of the user to assign the task to",
+                        "required": false,
+                        "schema": {"type": "string"}
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/assignableUsers": {
+            "get": {
+                "tags": ["internal"],
+                "summary": "Returns a list of assignable accounts ",
+                "description": "",
+                "operationId": "findAssignableUsersByNameOrEmail",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "nameOrEmail",
+                        "in": "query",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/AccountInfo"}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}/collaborators": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Returns a list of everyone assigned as a collaborator for a particular review task",
+                "description": "",
+                "operationId": "getCollaborators",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/TaskCollaboratorData"}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}/comment": {
+            "post": {
+                "tags": ["task"],
+                "summary": "Adds a comment on a particular review task",
+                "description": "",
+                "operationId": "addComment",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The comment to be added",
+                        "required": false,
+                        "schema": {"$ref": "#/definitions/CommentDetailsData"}
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {"$ref": "#/definitions/ActivityData"}
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}/download/modified/{filename}": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Downloads the current content of a particular review task",
+                "description": "",
+                "operationId": "downloadModifiedTask",
+                "produces": ["application/octet-stream"],
+                "parameters": [
+                    {
+                        "name": "filename",
+                        "in": "path",
+                        "description": "The filename of the downloaded file",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/download/original": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Download the original version of a particular review task",
+                "description": "",
+                "operationId": "downloadOriginalTask",
+                "produces": ["application/octet-stream"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/download/original/zip": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Download original task",
+                "description": "",
+                "operationId": "downloadOriginalTaskZip",
+                "produces": ["application/octet-stream"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/owners": {
+            "get": {
+                "tags": ["internal"],
+                "summary": "Returns assignable accounts filtered by user name or email",
+                "description": "",
+                "operationId": "findOwners",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/AccountInfo"}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/review/tasks/{id}/read": {
+            "post": {
+                "tags": ["task"],
+                "summary": "Marks the activity in particular review task as being read",
+                "description": "",
+                "operationId": "read",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The timestamp when the activity was read",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{id}/settings": {
+            "post": {
+                "tags": ["task"],
+                "summary": "Changes the settings for a particular review task",
+                "description": "",
+                "operationId": "changeSettings",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The settings to be applied",
+                        "required": false,
+                        "schema": {"$ref": "#/definitions/SettingsData"}
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the review task",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "default": {"description": "successful operation"}
+                }
+            }
+        },
+        "/api/review/tasks/{taskId}/files": {
+            "get": {
+                "tags": ["task"],
+                "summary": "Returns a list of files attached a particular review task",
+                "description": "",
+                "operationId": "getTaskFiles",
+                "produces": ["application/json"],
+                "parameters": [
+                    {
+                        "name": "taskId",
+                        "in": "path",
+                        "description": "The ID of the review task where the files are attached",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {"$ref": "#/definitions/FileDataWithLockInfo"}
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "ActivityData": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The ID of the activity"
+                },
+                "creationTime": {
+                    "type": "string",
+                    "description": "The activity creation time"
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The activity type. The possible values are: \"COMMENT\" or \"MODIFICATION\". If the type is \"MODIFICATION\", then the activity data also contains information about the changed files."
+                },
+                "message": {
+                    "type": "string",
+                    "description": "The message (added for a comment activity)"
+                },
+                "userStatus": {
+                    "type": "string",
+                    "description": "The user status submitted with this message: null or 'FINISHED'"
+                },
+                "files": {
+                    "type": "array",
+                    "description": "The modified files. This information is set when the activity type is \"MODIFICATION\".",
+                    "items": {"$ref": "#/definitions/FileData"}
+                },
+                "user": {
+                    "description": "The user who created the activity",
+                    "$ref": "#/definitions/UserData"
+                }
+            },
+            "description": "An activity recorded on a specific task (for example the current user adds a comment or edit a file)"
+        },
+        "Task": {"type": "object"},
+        "AgreeWithTermsParams": {
+            "type": "object",
+            "properties": {
+                "agree": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "TaskGeneralData": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The task id"
+                },
+                "title": {
+                    "type": "string",
+                    "description": "The task title"
+                },
+                "userRole": {
+                    "type": "string",
+                    "description": "The role of the current user on this task (\"OWNER\" or \"REVIEWER\")"
+                },
+                "creationTime": {
+                    "type": "string",
+                    "description": "The time when this task was created (represented in ISO-8601 format)"
+                },
+                "finished": {
+                    "type": "boolean",
+                    "description": "Flag telling if the task review has been completed.",
+                    "default": false
+                },
+                "settings": {
+                    "description": "The settings of the task (contains information like the context map or the change tracking imposed state)",
+                    "$ref": "#/definitions/SettingsData"
+                },
+                "finalizeReviewTime": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "Miliseconds date that represents when the review was finalized."
+                },
+                "activityUrl": {"type": "string"},
+                "baseUrl": {"type": "string"}
+            },
+            "description": "Information about a task."
+        },
+        "UserData": {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "avatarUrl": {"type": "string"},
+                "mailValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "githubValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "googleValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "mailNotificationsSettings": {"$ref": "#/definitions/MailNotificationsSettingsData"}
+            }
+        },
+        "CommentDetailsData": {
+            "type": "object",
+            "properties": {
+                "message": {"type": "string"},
+                "userStatus": {"type": "string"}
+            }
+        },
+        "TaskCollaboratorData": {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "avatarUrl": {"type": "string"},
+                "mailValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "githubValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "googleValidated": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "mailNotificationsSettings": {"$ref": "#/definitions/MailNotificationsSettingsData"},
+                "role": {"type": "string"}
+            }
+        },
+        "MailNotificationsSettingsData": {
+            "type": "object",
+            "properties": {
+                "messageAddedNotifsForOwner": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "messageAddedNotifs": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "reviewFinalizedForOwner": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "reviewerAddedForOwner": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "TasksActivitiesStatistics": {
+            "type": "object",
+            "properties": {
+                "generationTime": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "tasksActivities": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/TaskActivitiesStatistics"}
+                }
+            }
+        },
+        "SettingsData": {
+            "type": "object",
+            "properties": {
+                "forceTrackChanges": {
+                    "type": "boolean",
+                    "description": "Specifies whether change tracking is enabled for reviewers.",
+                    "default": false
+                },
+                "contextMap": {
+                    "type": "string",
+                    "description": "The DITA context map set on the task"
+                }
+            },
+            "description": "The settings of a task"
+        },
+        "FileLocationParams": {
+            "type": "object",
+            "properties": {
+                "filePath": {"type": "string"},
+                "taskId": {"type": "string"}
+            }
+        },
+        "InputPart": {
+            "type": "object",
+            "properties": {
+                "headers": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    }
+                },
+                "contentTypeFromMessage": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "mediaType": {"$ref": "#/definitions/MediaType"},
+                "bodyAsString": {"type": "string"}
+            }
+        },
+        "MultipartFormDataInput": {
+            "type": "object",
+            "properties": {
+                "formData": {
+                    "type": "object",
+                    "additionalProperties": {"$ref": "#/definitions/InputPart"}
+                },
+                "formDataMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {"$ref": "#/definitions/InputPart"}
+                    }
+                },
+                "preamble": {"type": "string"},
+                "parts": {
+                    "type": "array",
+                    "items": {"$ref": "#/definitions/InputPart"}
+                }
+            }
+        },
+        "LockData": {
+            "type": "object",
+            "properties": {
+                "ownerId": {
+                    "type": "string",
+                    "description": "The ID of the owner of the lock."
+                },
+                "timeToLive": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "The time in milliseconds after which the lock expires."
+                },
+                "ownerName": {
+                    "type": "string",
+                    "description": "The name of the owner of the lock."
+                },
+                "ownerAvatarUrl": {
+                    "type": "string",
+                    "description": "The URL of the lock owner's avatar."
+                }
+            },
+            "description": "Information about a file lock."
+        },
+        "MediaType": {
+            "type": "object",
+            "properties": {
+                "type": {"type": "string"},
+                "subtype": {"type": "string"},
+                "parameters": {
+                    "type": "object",
+                    "additionalProperties": {"type": "string"}
+                },
+                "wildcardType": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "wildcardSubtype": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "FileDataWithLockInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The file id"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The file name"
+                },
+                "path": {
+                    "type": "string",
+                    "description": "The file path"
+                },
+                "lock": {
+                    "description": "The file lock",
+                    "$ref": "#/definitions/LockData"
+                }
+            },
+            "description": "Information about a file, including lock information."
+        },
+        "FileData": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "The file id"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The file name"
+                },
+                "path": {
+                    "type": "string",
+                    "description": "The file path"
+                }
+            },
+            "description": "Information about a file."
+        },
+        "AccountInfo": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "email": {"type": "string"},
+                "id": {"type": "string"},
+                "avatarUrl": {"type": "string"}
+            }
+        },
+        "TaskActivitiesStatistics": {
+            "type": "object",
+            "properties": {
+                "taskID": {"type": "string"},
+                "hasChanges": {
+                    "type": "boolean",
+                    "readOnly": true,
+                    "default": false
+                },
+                "lastChangedFilesCount": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "lastCommentsCount": {
+                    "type": "integer",
+                    "format": "int32",
+                    "readOnly": true
+                },
+                "lastChangedFiles": {
+                    "type": "array",
+                    "readOnly": true,
+                    "uniqueItems": true,
+                    "items": {"type": "string"}
+                }
+            }
+        }
+    }
+}
