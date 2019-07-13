@@ -59,9 +59,7 @@
         <xsl:variable name="schema_ref" select="json:get($prop, '$ref')"/>
         
         <xsl:choose>
-            <xsl:when test="$type = 'array'">
-                Array of <xsl:copy-of select="json:prop-type(json:get($prop, 'items'))"/>
-            </xsl:when>
+            <xsl:when test="$type = 'array'">Array of <xsl:copy-of select="json:prop-type(json:get($prop, 'items'))"/></xsl:when>
             <xsl:when test="not(empty($type))"><xsl:value-of select="$type"/></xsl:when>
             <xsl:when test="not(empty($schema_ref))">
                 <xsl:variable name="schema-name" select="substring-after($schema_ref, '#/definitions/')"/>
@@ -112,26 +110,56 @@
                 <xsl:call-template name="params">
                     <xsl:with-param name="params" select="json:get(., 'parameters')/*"/>
                 </xsl:call-template>
+                <xsl:call-template name="responses">
+                    <xsl:with-param name="responses" select="json:get(., 'responses')/*"/>
+                </xsl:call-template>
             </body>
         </topic>
+    </xsl:template>
+
+    <!-- Generate DITA for OpenAPI responses of a method. -->
+    <xsl:template name="responses">
+        <xsl:param name="responses"/>
+        <xsl:if test="count($responses) > 0">
+            <section>
+                <title>Responses</title>
+                <dl>
+                    <xsl:for-each select="$responses">
+                        <dlentry>
+                            <dt><xsl:value-of select="./@key"/></dt>
+                            <dd>
+                                <xsl:value-of select="json:get(., 'description')"/>
+                            </dd>
+                            <xsl:variable name="type" select="json:prop-type(json:get(., 'schema'))"/>
+                            <xsl:if test="not(empty($type))">
+                                <dd><xsl:copy-of select="$type"/></dd>
+                            </xsl:if>
+                        </dlentry>
+                    </xsl:for-each>
+                </dl>    
+            </section>
+        </xsl:if>
     </xsl:template>
     
     <!-- Generate DITA for OpenAPI params of a method. -->
     <xsl:template name="params">
         <xsl:param name="params"/>
         <xsl:if test="count($params) > 0">
-            <parml>
-                <xsl:for-each select="$params">
-                    <plentry>
-                        <pt><xsl:value-of select="json:get(.,'name')"/></pt>
-                        <pd>
-                            <xsl:call-template name="paramdesc">
-                                <xsl:with-param name="info" select="."></xsl:with-param>
-                            </xsl:call-template>
-                        </pd>
-                    </plentry>
-                </xsl:for-each>
-            </parml>
+            <section>
+                <title>Parameters</title>
+                <parml>
+                    <xsl:for-each select="$params">
+                        <plentry>
+                            <pt><xsl:value-of select="json:get(.,'name')"/></pt>
+                            <pd>
+                                <xsl:call-template name="paramdesc">
+                                    <xsl:with-param name="info" select="."></xsl:with-param>
+                                </xsl:call-template>
+                            </pd>
+                        </plentry>
+                    </xsl:for-each>
+                </parml>    
+            </section>
         </xsl:if>
     </xsl:template>
 
