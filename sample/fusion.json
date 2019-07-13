@@ -83,7 +83,7 @@
                 "tags": ["task"],
                 "summary": "List the files from a given folder.",
                 "description": "",
-                "operationId": "getContent",
+                "operationId": "getFiles",
                 "produces": ["application/json"],
                 "parameters": [
                     {
@@ -159,7 +159,7 @@
                 "tags": ["task"],
                 "summary": "Clears the locks set on files.",
                 "description": "",
-                "operationId": "getContent",
+                "operationId": "clearLocks",
                 "parameters": [],
                 "responses": {
                     "default": {"description": "successful operation"}
