@@ -4,52 +4,77 @@
     xmlns:json="http://www.oxygenxml.com/ns/expath/json"
     exclude-result-prefixes="xs json"
     version="2.0">
-    <xsl:output doctype-public="-//OASIS//DTD DITA Composite//EN"
-        doctype-system="ditabase.dtd"
+    <xsl:output name="topic" 
+        doctype-public="-//OASIS//DTD DITA Topic//EN"
+        doctype-system="topic.dtd"
         indent="yes"/>
+    
+    <xsl:output name="map" 
+        doctype-public="-//OASIS//DTD DITA Map//EN"
+        doctype-system="map.dtd"
+        indent="yes"/>
+    
     
     <!-- Generate DITA content for an OpenAPI spec. -->
     <xsl:template name="main">
-        <xsl:variable name="descriptor" select="json-to-xml(unparsed-text('sample/fusion.json'))/*:map"/>
-        <dita>
-            <xsl:call-template name="intro">
-                <xsl:with-param name="info" select="json:get($descriptor, 'info')"></xsl:with-param>
-            </xsl:call-template>
-            <xsl:for-each select="json:get($descriptor, 'paths')/*">
-                <xsl:call-template name="path"/>
-            </xsl:for-each>
-            <xsl:for-each select="json:get($descriptor, 'definitions')/*">
-                <xsl:call-template name="definition"/>
-            </xsl:for-each>
-        </dita>
+        <xsl:variable name="descriptor" select="json-to-xml(unparsed-text('../3.%20openapi/3.%20Convert%20OpenAPI%20to%20DITA/fusion.json'))/*:map"/>
+        <xsl:for-each select="json:get($descriptor, 'definitions')/*">
+            <xsl:call-template name="definition"/>
+        </xsl:for-each>
+        <xsl:for-each select="json:get($descriptor, 'paths')/*">
+            <xsl:call-template name="path"/>
+        </xsl:for-each>
+        <xsl:result-document href="generated/map.dita" format="map">
+            <map>
+                <xsl:call-template name="intro">
+                    <xsl:with-param name="info" select="json:get($descriptor, 'info')"></xsl:with-param>
+                </xsl:call-template>
+                <topichead navtitle="Endpoints">
+                    <xsl:for-each select="json:get($descriptor, 'paths')/*">
+                        <xsl:for-each select="./*">
+                            <topicref href="{concat(json:get(., 'operationId')/text(), '-', @key, '.dita')}"/>
+                        </xsl:for-each>
+                    </xsl:for-each>
+                </topichead>
+                <topichead navtitle="Resources">
+                    <xsl:for-each select="json:get($descriptor, 'definitions')/*">
+                        <topicref href="{concat('schema-', @key, '.dita')}"/>
+                    </xsl:for-each>
+                </topichead>
+            </map>
+        </xsl:result-document>
     </xsl:template>
     
     <!-- Generate DITA content for an OpenAPI definition. -->
     <xsl:template name="definition">
-        <topic>
-            <xsl:attribute name="id" select="concat('schema-', ./@key)"></xsl:attribute>
-            <title>Data type: <xsl:value-of select="./@key"/></title>
-            <body>
-                <xsl:variable name="props" select="json:get(., 'properties')/*"/>
-                <xsl:if test="not(empty($props))">
-                    <dl>
-                       <xsl:for-each select="$props">
-                           <xsl:variable name="type" select="json:prop-type(.)"/>
-                           <dlentry>
-                               <dt>
-                                   <xsl:value-of select="./@key"/>
-                                   <xsl:if test="not(empty($type))">
-                                       (<xsl:copy-of select="$type"/>)
-                                   </xsl:if>
-                               </dt>
-                               <dd><xsl:value-of select="json:get(., 'description')"/></dd>
-                               
-                           </dlentry>
-                       </xsl:for-each>                    
-                    </dl>
-                </xsl:if>
-            </body>
-        </topic>
+        <xsl:variable name="id" select="concat('schema-', ./@key)"/>
+        <xsl:result-document href="{concat('generated/', $id, '.dita')}" format="topic">
+            <!-- TODO: Parameterized output file. --> 
+            <topic>
+                <xsl:attribute name="id" select="$id"/>
+                <title>Data type: <xsl:value-of select="./@key"/></title>
+                <body>
+                    <xsl:variable name="props" select="json:get(., 'properties')/*"/>
+                    <xsl:if test="not(empty($props))">
+                        <dl>
+                           <xsl:for-each select="$props">
+                               <xsl:variable name="type" select="json:prop-type(.)"/>
+                               <dlentry>
+                                   <dt>
+                                       <xsl:value-of select="./@key"/>
+                                       <xsl:if test="not(empty($type))">
+                                           (<xsl:copy-of select="$type"/>)
+                                       </xsl:if>
+                                   </dt>
+                                   <dd><xsl:value-of select="json:get(., 'description')"/></dd>
+                                   
+                               </dlentry>
+                           </xsl:for-each>                    
+                        </dl>
+                    </xsl:if>
+                </body>
+            </topic>
+        </xsl:result-document>
     </xsl:template>
     
     <!-- Determine the type of an OpenAPI property. -->
@@ -76,45 +101,49 @@
     <!-- Generate intro an OpenAPI spec. -->
     <xsl:template name="intro">
         <xsl:param name="info"/>
-        <topic id="intro">
-            <title><xsl:value-of select="json:get($info,'title')"/></title>
-            <shortdesc><xsl:value-of select="json:get($info,'description')"/></shortdesc>
-            <body/>
-        </topic>
+        <title>
+            <xsl:attribute name="id">api-title</xsl:attribute>
+            <xsl:value-of select="json:get($info,'title')"/>
+        </title>
     </xsl:template>
 
     <!-- Generate DITA for an OpenAPI path. -->
     <xsl:template name="path">
         <!-- For each method we generate a topic. -->
         <xsl:for-each select="./*">
-            <xsl:call-template name="method">
-                <xsl:with-param name="path" select="./@key"></xsl:with-param>
-            </xsl:call-template>
+            <xsl:call-template name="method"/>
         </xsl:for-each>
     </xsl:template>
     
     <!-- Generate DITA for an OpenAPI method. -->
     <xsl:template name="method">
-        <xsl:param name="path"/>
         <xsl:variable name="topicId" 
-            select="concat(json:get(., 'operationId')/text(), @key)"/>
-        <topic>
-            <xsl:attribute name="id"><xsl:value-of select="$topicId"/></xsl:attribute>
-            <title><xsl:value-of select="json:get(.,'summary')"/></title>
-            <shortdesc><xsl:value-of select="json:get(.,'description')"/></shortdesc>
-            
-            <xsl:call-template name="tags">
-                <xsl:with-param name="tags" select="json:get(., 'tags')/*"/>
-            </xsl:call-template>
-            <body>
-                <xsl:call-template name="params">
-                    <xsl:with-param name="params" select="json:get(., 'parameters')/*"/>
+            select="concat(json:get(., 'operationId')/text(), '-', @key)"/>
+        <xsl:result-document href="{concat('generated/', $topicId, '.dita')}" format="topic">
+            <topic>
+                <xsl:attribute name="id"><xsl:value-of select="$topicId"/></xsl:attribute>
+                <title>
+                    <xsl:attribute name="id" select="concat($topicId, '-title')"/>
+                    <xsl:value-of select="json:get(.,'summary')"/>
+                </title>
+                <shortdesc>
+                    <xsl:attribute name="id" select="concat($topicId, '-shortdesc')"/>
+                    <xsl:value-of select="json:get(.,'description')"/>
+                </shortdesc>
+                
+                <xsl:call-template name="tags">
+                    <xsl:with-param name="tags" select="json:get(., 'tags')/*"/>
                 </xsl:call-template>
-                <xsl:call-template name="responses">
-                    <xsl:with-param name="responses" select="json:get(., 'responses')/*"/>
-                </xsl:call-template>
-            </body>
-        </topic>
+                <body>
+                    <xsl:call-template name="params">
+                        <xsl:with-param name="params" select="json:get(., 'parameters')/*"/>
+                    </xsl:call-template>
+                    <xsl:call-template name="responses">
+                        <xsl:with-param name="responses" select="json:get(., 'responses')/*"/>
+                    </xsl:call-template>
+                </body>
+            </topic>
+        </xsl:result-document>
     </xsl:template>
 
     <!-- Generate DITA for OpenAPI responses of a method. -->
